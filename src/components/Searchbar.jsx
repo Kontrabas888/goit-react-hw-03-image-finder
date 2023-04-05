@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import ImageGallery from './ImageGallery';
 import Loader from './Loader';
 import Style from 'Styles.module.css';
 import LoadMoreButton from './LoadMoreButton';
-
-const API_KEY = '33842620-c45ae5552145e5cf17e045425';
+import ApiHandler from './ApiHandler';
 
 const Searchbar = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -31,15 +29,7 @@ const Searchbar = () => {
     event.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.get('https://pixabay.com/api/', {
-        params: {
-          key: API_KEY,
-          q: searchTerm,
-          per_page: 12,
-          page: 1,
-        },
-      });
-      const results = response.data.hits;
+      const results = await ApiHandler(searchTerm, 1);
       setSearchResults(results);
     } catch (error) {
       console.error(error);
@@ -50,15 +40,7 @@ const Searchbar = () => {
   const handleLoadMore = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('https://pixabay.com/api/', {
-        params: {
-          key: API_KEY,
-          q: searchTerm,
-          per_page: 12,
-          page: pageNumber + 1,
-        },
-      });
-      const results = response.data.hits;
+      const results = await ApiHandler(searchTerm, pageNumber + 1);
       setSearchResults((prevResults) => [...prevResults, ...results]);
       setPageNumber((prevPageNumber) => prevPageNumber + 1);
     } catch (error) {
